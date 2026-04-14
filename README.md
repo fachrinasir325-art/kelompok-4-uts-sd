@@ -46,13 +46,21 @@ public:
         cout<<"Nama: "; cin>>x.nama;
         cout<<"Usia: "; cin>>x.usia;
 
-        int p;
-        cout<<"Poli (1.Umum 2.Anak 3.Gigi): ";
-        cin>>p;
-        x.poli = poliList[p];
+        int pilihanPoli;
+        do {
+            cout<<"Poli (1.Umum 2.Anak 3.Gigi): ";
+            cin>>pilihanPoli;
+            if(pilihanPoli<1 || pilihanPoli>3)
+                cout<<"Poli yang anda masukkan tidak valid!\nMasukkan ulang ";
+        } while(pilihanPoli<1 || pilihanPoli>3);
+        x.poli = poliList[pilihanPoli];
 
-        cout<<"Prioritas (1.Darurat 2.Prioritas 3.Normal): ";
-        cin>>x.prioritas;
+        do {
+            cout<<"Prioritas (1.Darurat 2.Prioritas 3.Normal): ";
+            cin>>x.prioritas;
+            if(x.prioritas<1 || x.prioritas>3)
+                cout<<"Prioritas antrian yang anda masukkan tidak valid!\nMasukkan ulang ";
+        } while(x.prioritas<1 || x.prioritas>3);
 
         x.noAntrian = noAnt(x.prioritas);
 
@@ -63,6 +71,10 @@ public:
     }
 
     void tampil() {
+        if(jumlah==0) {
+            cout<<"Belum ada pasien yang terdaftar.\n";
+            return;
+        }
         for(int i=0;i<jumlah;i++) {
             cout<<i+1<<". "<<antrian[i].nama
                 <<" | "<<antrian[i].noAntrian
@@ -116,19 +128,6 @@ public:
         }
     }
 
-    void update() {
-        string no;
-        cout<<"No Antrian: "; cin>>no;
-
-        for(int i=0;i<jumlah;i++) {
-            if(antrian[i].noAntrian==no) {
-                cout<<"Nama baru: ";
-                cin>>antrian[i].nama;
-                return;
-            }
-        }
-    }
-
     void sortingNama() {
         for(int i=0;i<jumlah-1;i++) {
             for(int j=i+1;j<jumlah;j++) {
@@ -141,6 +140,10 @@ public:
     }
 
     void tampilRiwayat() {
+        if(selesai == 0) {
+            cout << "Belum ada riwayat\n";
+            return;
+        }
         for(int i=0;i<selesai;i++) {
             cout<<riwayat[i].p.nama<<" selesai\n";
         }
@@ -150,7 +153,7 @@ public:
         int pilih;
         while(true) {
             cout<<"\n1.Daftar 2.Tampil 3.Panggil 4.Selesai\n";
-            cout<<"5.Batal 6.Update 7.Sort 8.Riwayat 0.Keluar\n";
+            cout<<"5.Hapus 6.Sort 7.Riwayat 0.Keluar\n";
             cout<<"Pilih: ";
             cin>>pilih;
 
@@ -160,9 +163,8 @@ public:
                 case 3: panggil(); break;
                 case 4: selesaiPasien(); break;
                 case 5: batal(); break;
-                case 6: update(); break;
-                case 7: sortingNama(); break;
-                case 8: tampilRiwayat(); break;
+                case 6: sortingNama(); break;
+                case 7: tampilRiwayat(); break;
                 case 0: return;
             }
         }
