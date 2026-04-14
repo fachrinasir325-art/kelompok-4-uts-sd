@@ -78,6 +78,7 @@ public:
         for(int i=0;i<jumlah;i++) {
             cout<<i+1<<". "<<antrian[i].nama
                 <<" | "<<antrian[i].noAntrian
+                <<" | "<<antrian[i].poli
                 <<" | "<<antrian[i].status<<"\n";
         }
     }
