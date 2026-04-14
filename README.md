@@ -127,6 +127,7 @@ public:
                 return;
             }
         }
+        cout << "Data pasien tidak ditemukan!" << endl;
     }
 
     void sortingNama() {
