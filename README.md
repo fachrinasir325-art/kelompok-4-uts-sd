@@ -1,179 +1,166 @@
 #include <iostream>
-#include <string>
 using namespace std;
 
-struct Pasien {
-    int id, usia, prioritas;
-    string nama, poli, status, noAntrian;
+struct Buku {
+    int id;
+    string judul, penulis, genre;
+    int tahun;
+    bool tersedia;
 };
 
-struct Riwayat {
-    Pasien p;
-};
-
-class Sistem {
+class Perpustakaan {
 private:
-    Pasien antrian[100];
-    Riwayat riwayat[100];
-    int jumlah = 0, selesai = 0;
+    Buku* data;
+    int jumlah;
+    int nextId;
 
-    int id = 1, d=0, p=0, n=0;
-
-    string poliList[4] = {"","Umum","Anak","Gigi"};
-
-    string noAnt(int pr) {
-        if(pr==1) return "D"+to_string(++d);
-        if(pr==2) return "P"+to_string(++p);
-        return "N"+to_string(++n);
-    }
-
-    void sortPrioritas() {
-        for(int i=0;i<jumlah-1;i++) {
-            for(int j=0;j<jumlah-i-1;j++) {
-                if(antrian[j].prioritas > antrian[j+1].prioritas) {
-                    swap(antrian[j], antrian[j+1]);
+    void urutkan() {
+        for (int i = 0; i < jumlah - 1; i++) {
+            for (int j = i + 1; j < jumlah; j++) {
+                if (data[i].tahun > data[j].tahun) {
+                    swap(data[i], data[j]);
                 }
             }
         }
     }
 
 public:
-    void daftar() {
-        Pasien x;
-        x.id = id++;
-        x.status = "Menunggu";
+    Perpustakaan() {
+        data = new Buku[100];
+        jumlah = 0;
+        nextId = 1;
+    }
 
-        cout<<"Nama: "; cin>>x.nama;
-        cout<<"Usia: "; cin>>x.usia;
+    void tambah() {
+        if (jumlah >= 100) {
+            cout << "Kapasitas penuh\n";
+            return;
+        }
 
-        int pilihanPoli;
-        do {
-            cout<<"Poli (1.Umum 2.Anak 3.Gigi): ";
-            cin>>pilihanPoli;
-            if(pilihanPoli<1 || pilihanPoli>3)
-                cout<<"Poli yang anda masukkan tidak valid!\nMasukkan ulang ";
-        } while(pilihanPoli<1 || pilihanPoli>3);
-        x.poli = poliList[pilihanPoli];
+        Buku b;
+        b.id = nextId++;
 
-        do {
-            cout<<"Prioritas (1.Darurat 2.Prioritas 3.Normal): ";
-            cin>>x.prioritas;
-            if(x.prioritas<1 || x.prioritas>3)
-                cout<<"Prioritas antrian yang anda masukkan tidak valid!\nMasukkan ulang ";
-        } while(x.prioritas<1 || x.prioritas>3);
+        cin.ignore();
+        cout << "Judul   : "; getline(cin, b.judul);
+        cout << "Penulis : "; getline(cin, b.penulis);
+        cout << "Genre   : "; getline(cin, b.genre);
+        cout << "Tahun   : "; cin >> b.tahun;
 
-        x.noAntrian = noAnt(x.prioritas);
+        b.tersedia = true;
+        data[jumlah++] = b;
 
-        antrian[jumlah++] = x;
-        sortPrioritas();
-
-        cout<<"No Antrian: "<<x.noAntrian<<"\n";
+        cout << "Buku ditambahkan\n";
     }
 
     void tampil() {
-        if(jumlah==0) {
-            cout<<"Belum ada pasien yang terdaftar.\n";
+        if (jumlah == 0) {
+            cout << "Tidak ada buku\n";
             return;
         }
-        for(int i=0;i<jumlah;i++) {
-            cout<<i+1<<". "<<antrian[i].nama
-                <<" | "<<antrian[i].noAntrian
-                <<" | "<<antrian[i].poli
-                <<" | "<<antrian[i].status<<"\n";
+
+        cout << "\nDaftar Buku:\n";
+        for (int i = 0; i < jumlah; i++) {
+            cout << data[i].id << ". " << data[i].judul
+                 << " | " << data[i].penulis
+                 << " | " << data[i].genre
+                 << " | " << data[i].tahun
+                 << " [" << (data[i].tersedia ? "Tersedia" : "Dipinjam") << "]\n";
         }
     }
 
-    void panggil() {
-        for(int i=0;i<jumlah;i++) {
-            if(antrian[i].status=="Menunggu") {
-                antrian[i].status="Dipanggil";
-                cout<<"Panggil: "<<antrian[i].nama<<"\n";
-                return;
-            }
-        }
-        cout<<"Tidak ada\n";
-    }
+    void pinjam() {
+        int id;
+        cout << "ID: "; cin >> id;
 
-    void selesaiPasien() {
-        string no;
-        cout<<"No Antrian: "; cin>>no;
-
-        for(int i=0;i<jumlah;i++) {
-            if(antrian[i].noAntrian==no) {
-                riwayat[selesai++].p = antrian[i];
-
-                for(int j=i;j<jumlah-1;j++)
-                    antrian[j]=antrian[j+1];
-
-                jumlah--;
-                cout<<"Selesai\n";
-                return;
-            }
-        }
-        cout<<"Tidak ditemukan\n";
-    }
-
-    void batal() {
-        string no;
-        cout<<"No Antrian: "; cin>>no;
-
-        for(int i=0;i<jumlah;i++) {
-            if(antrian[i].noAntrian==no) {
-                for(int j=i;j<jumlah-1;j++)
-                    antrian[j]=antrian[j+1];
-
-                jumlah--;
-                cout<<"Dibatalkan\n";
-                return;
-            }
-        }
-        cout << "Data pasien tidak ditemukan!" << endl;
-    }
-
-    void sortingNama() {
-        for(int i=0;i<jumlah-1;i++) {
-            for(int j=i+1;j<jumlah;j++) {
-                if(antrian[i].nama > antrian[j].nama) {
-                    swap(antrian[i], antrian[j]);
+        for (int i = 0; i < jumlah; i++) {
+            if (data[i].id == id) {
+                if (data[i].tersedia) {
+                    data[i].tersedia = false;
+                    cout << "Dipinjam\n";
+                } else {
+                    cout << "Sudah dipinjam\n";
                 }
+                return;
             }
         }
-        cout<<"Diurutkan berdasarkan nama\n";
+        cout << "Tidak ditemukan\n";
     }
 
-    void tampilRiwayat() {
-        if(selesai == 0) {
-            cout << "Belum ada riwayat\n";
+    void kembali() {
+        int id;
+        cout << "ID: "; cin >> id;
+
+        for (int i = 0; i < jumlah; i++) {
+            if (data[i].id == id) {
+                if (!data[i].tersedia) {
+                    data[i].tersedia = true;
+                    cout << "Dikembalikan\n";
+                } else {
+                    cout << "Buku tidak dipinjam\n";
+                }
+                return;
+            }
+        }
+        cout << "Tidak ditemukan\n";
+    }
+
+    void hapus() {
+        int id;
+        cout << "ID: "; cin >> id;
+
+        for (int i = 0; i < jumlah; i++) {
+            if (data[i].id == id) {
+                for (int j = i; j < jumlah - 1; j++) {
+                    data[j] = data[j + 1];
+                }
+                jumlah--;
+                cout << "Dihapus\n";
+                return;
+            }
+        }
+        cout << "Tidak ditemukan\n";
+    }
+
+    void sortBuku() {
+        if (jumlah == 0) {
+            cout << "Tidak ada buku untuk diurutkan\n";
             return;
         }
-        for(int i=0;i<selesai;i++) {
-            cout<<riwayat[i].p.nama<<" selesai\n";
-        }
-    }
 
-    void menu() {
-        int pilih;
-        while(true) {
-            cout<<"\n1.Daftar 2.Tampil 3.Panggil 4.Selesai\n";
-            cout<<"5.Hapus 6.Sort 7.Riwayat 0.Keluar\n";
-            cout<<"Pilih: ";
-            cin>>pilih;
-
-            switch(pilih) {
-                case 1: daftar(); break;
-                case 2: tampil(); break;
-                case 3: panggil(); break;
-                case 4: selesaiPasien(); break;
-                case 5: batal(); break;
-                case 6: sortingNama(); break;
-                case 7: tampilRiwayat(); break;
-                case 0: return;
-            }
-        }
+        urutkan();
+        cout << "Data berhasil diurutkan berdasarkan tahun\n";
     }
 };
 
 int main() {
-    Sistem s;
-    s.menu();
+    Perpustakaan p;
+    int pilih;
+
+    cout << "===================================================\n";
+    cout << "= Selamat datang di sistem manajemen perpustakaan =\n";
+    cout << "===================================================\n";
+
+    do {
+        cout << "\n=== MENU ===";
+        cout << "\n1.Tambah buku\n2.Tampilkan buku\n3.Pinjam buku\n4.Kembali buku\n5.Hapus buku\n6.Sort\n0.Keluar\n";
+        cout << "Pilih: ";
+        cin >> pilih;
+
+        switch (pilih) {
+            case 1: p.tambah(); break;
+            case 2: p.tampil(); break;
+            case 3: p.pinjam(); break;
+            case 4: p.kembali(); break;
+            case 5: p.hapus(); break;
+            case 6: p.sortBuku(); break;
+            case 0:
+                cout << "Keluar dari program...\n";
+                break;
+            default:
+                cout << "Pilihan tidak valid\n";
+        }
+
+    } while (pilih != 0);
+
+    return 0;
 }
